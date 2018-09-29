@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include "point.h"
 
 using namespace std;
@@ -8,7 +9,13 @@ using namespace std;
 //Point type to get/set all the data
 Point point;
 
-int main() {
+//Mutex time!
+mutex mtx;
+
+//unique lock so mutex can be watched
+unique_lock<mutex> lck(mtx, defer_lock);
+
+int main(void) {
 	thread t1(quikMafs);
 	thread t2(quikWrite);
 	thread t3(quikLog);
@@ -24,19 +31,40 @@ int main() {
 //TODO: add writing of data
 void quikMafs() {
 	int res = 0;
+	int i = 1;
 
-	for (int i = 1; i < 257; i++) {
+	for (;;) {
+		lck.lock();
 		res = i * i * i + 2 * i * i - 3 * i + 4;
+
 		//add both i and res to point
+
+		if (i = 256) {
+			lck.unlock();
+			break;
+		}
+		else {
+			i++;
+			lck.unlock();
+		}
 	}
 }
 
 //func for thread2, write to file
 //TODO: add reading of data
 void quikWrite() {
+	lck.lock();
+
 	ofstream fout("output.txt");
 
+	//fout result from point to file
 
+	//we might do the following to guarantee quikMafs to start first
+	//if this locks mutex before quikMafs, that means that Point is empty
+	//so add check if point is null, then unlock mutex
+	//after this quikMafs catches mutex, so we are guaranteed, that it starts working first
+
+	lck.unlock();
 }
 
 //func for thread3, log everything
@@ -44,7 +72,12 @@ void quikWrite() {
 void quikLog() {
 	ofstream lout("log.txt");
 
-
+	while (true){
+		if (lck.owns_lock())
+			//TODO: output time
+			lout << "Hello!" << endl;
+	}
 }
 
 //TODO: create threadsafe smart pointer (omg)
+//TODO: richter (to read through)
