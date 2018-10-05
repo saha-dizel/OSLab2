@@ -13,7 +13,7 @@ Point point;
 mutex mtx;
 
 //unique lock so mutex can be watched
-unique_lock<mutex> lck(mtx, defer_lock);
+unique_lock< mutex > lck(mtx, defer_lock);
 
 int main(void) {
 	thread t1(quikMafs);

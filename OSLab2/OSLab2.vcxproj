@@ -112,6 +112,7 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="safe_ptr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="point.h" />
